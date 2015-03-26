@@ -15,7 +15,8 @@
     "inherits": "~2.0.1",
     "object-inspect": "~0.4.0",
     "resumer": "~0.0.0",
-    "through": "~2.3.4"
+    "through": "~2.3.4",
+    "yamljs": "^0.1.5"
   },
   "devDependencies": {
     "tap": "~0.4.8",

@@ -15,7 +15,7 @@ test(function (t) {
             'ok 1 should be equal',
             'not ok 2 .end() called twice',
             '  ---',
-            '    operator: fail',
+            '  operator: fail',
             '  ...',
             '',
             '1..2',
