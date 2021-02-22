@@ -14,9 +14,20 @@ var canExit = typeof process !== 'undefined' && process
 ;
 
 exports = module.exports = (function () {
+    var wait = false;
     var harness;
     var lazyLoad = function () {
         return getHarness().apply(this, arguments);
+    };
+
+    lazyLoad.wait = function () {
+        wait = true;
+    };
+
+    lazyLoad.run = function () {
+        var run = getHarness().run;
+
+        if (run) run();
     };
 
     lazyLoad.only = function () {
@@ -48,25 +59,24 @@ exports = module.exports = (function () {
     function getHarness(opts) {
         if (!opts) opts = {};
         opts.autoclose = !canEmitExit;
-        if (!harness) harness = createExitHarness(opts);
+        if (!harness) harness = createExitHarness(opts, wait);
         return harness;
     }
 })();
 
-function createExitHarness(conf) {
+function createExitHarness(conf, wait) {
     if (!conf) conf = {};
     var harness = createHarness({
         autoclose: defined(conf.autoclose, false)
     });
-
-    var stream = harness.createStream({ objectMode: conf.objectMode });
-    var es = stream.pipe(conf.stream || createDefaultStream());
-    if (canEmitExit) {
-        es.on('error', function (err) { harness._exitCode = 1; });
-    }
-
+    var running = false;
     var ended = false;
-    stream.on('end', function () { ended = true; });
+
+    if (wait) {
+        harness.run = run;
+    } else {
+        run();
+    }
 
     if (conf.exit === false) return harness;
     if (!canEmitExit || !canExit) return harness;
@@ -92,6 +102,17 @@ function createExitHarness(conf) {
     });
 
     return harness;
+
+    function run() {
+        if (running) return;
+        running = true;
+        var stream = harness.createStream({ objectMode: conf.objectMode });
+        var es = stream.pipe(conf.stream || createDefaultStream());
+        if (canEmitExit) {
+            es.on('error', function (err) { harness._exitCode = 1; });
+        }
+        stream.on('end', function () { ended = true; });
+    };
 }
 
 exports.createHarness = createHarness;
