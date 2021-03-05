@@ -3,6 +3,7 @@
 tap-producing test harness for node and browsers
 
 [![build status](https://secure.travis-ci.org/substack/tape.svg?branch=master)](http://travis-ci.org/substack/tape)
+[![codecov](https://codecov.io/gh/substack/tape/branch/master/graph/badge.svg)](https://codecov.io/gh/substack/tape)
 
 ![tape](https://web.archive.org/web/20170612184731if_/http://substack.net/images/tape_drive.png)
 
