@@ -65,7 +65,7 @@ var files = opts._.reduce(function (result, arg) {
 
 if (hasImportSyntax()) {
     hasImport()
-        .then(function (x) { importFiles(x); })
+        .then(function (x) { return importFiles(x); })
         .then(function () { tape.run(); })
         .catch(function (err) {
             console.error(err);
