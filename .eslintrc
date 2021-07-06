@@ -28,6 +28,7 @@
         }],
         "strict": "error",
     },
+    "ignorePatterns": [ "syntax-error.*" ],
     "overrides": [
         {
             "files": ["*.mjs", "test/import/package_type/*.js"],
