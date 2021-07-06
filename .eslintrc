@@ -28,7 +28,21 @@
         }],
         "strict": "error",
     },
+    "ignorePatterns": [ "syntax-error.*" ],
     "overrides": [
+        {
+            "files": ["*.mjs", "test/import/package_type/*.js"],
+            "parserOptions": {
+                "ecmaVersion": 2020,
+                "sourceType": "module",
+            },
+        },
+        {
+            "files": ["bin/import-or-require.js"],
+            "parserOptions": {
+                "ecmaVersion": 2020,
+            },
+        },
         {
             "files": ["test/async-await/*"],
             "parserOptions": {

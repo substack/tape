@@ -8,6 +8,9 @@ var readFileSync = require('fs').readFileSync;
 var parseOpts = require('minimist');
 var glob = require('glob');
 var ignore = require('dotignore');
+var hasImport = require('has-dynamic-import');
+
+var tape = require('../');
 
 var opts = parseOpts(process.argv.slice(2), {
     alias: { r: 'require', i: 'ignore' },
@@ -47,7 +50,7 @@ var files = opts._.reduce(function (result, arg) {
     var files = glob.sync(arg);
 
     if (!Array.isArray(files)) {
-        throw new TypeError('unknown error: glob.sync did not return an array or throw. Please report this.');
+        throw new TypeError('unknown error: glob.sync("' + arg + '") did not return an array or throw. Please report this.');
     }
 
     return result.concat(files);
@@ -57,6 +60,28 @@ var files = opts._.reduce(function (result, arg) {
     return resolvePath(cwd, file);
 });
 
-files.forEach(function (x) { require(x); });
+hasImport().then(function (hasSupport) {
+    // the nextTick callback gets called outside the promise chain, avoiding
+    // promises and unhandled rejections when only loading commonjs files
+    process.nextTick(importFiles, hasSupport);
+});
+
+function importFiles(hasSupport) {
+    if (!hasSupport) {
+        return files.forEach(function (x) { require(x); });
+    }
+
+    var importOrRequire = require('./import-or-require');
+
+    tape.wait();
+
+    var promise = files.reduce(function (promise, file) {
+        return promise ? promise.then(function () {
+            return importOrRequire(file);
+        }) : importOrRequire(file);
+    }, null);
+
+    return promise ? promise.then(function () { tape.run(); }) : tape.run();
+}
 
 // vim: ft=javascript
